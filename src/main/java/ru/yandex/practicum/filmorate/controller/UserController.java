@@ -1,10 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.core.IdIterator;
 import ru.yandex.practicum.filmorate.model.User;
@@ -35,31 +31,14 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<?> update(@Valid @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         log.info("USER UPDATE INPUT - {}!", user);
         Integer userId = user.getId();
-        if (users.containsKey(userId)) {
-            users.put(userId, user);
-            return ResponseEntity.ok(user);
-        } else {
-            log.info("USER UPDATE ERROR - User with ID {} not found!", userId);
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "User with ID " + userId + " not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        if (!users.containsKey(userId)) {
+            throw new NoSuchElementException("User with ID " + userId + " not found");
         }
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        log.info("VALIDATION ERRORS - {}!", errors);
-        return errors;
+        users.put(userId, user);
+        return user;
     }
 }
 
