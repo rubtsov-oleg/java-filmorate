@@ -56,7 +56,7 @@ public class FilmController {
             @RequestParam(defaultValue = "10")
             @Min(value = 1, message = "Count should be bigger than 0")
             Integer count
-    ){
+    ) {
         return filmService.getPopularFilms(count);
     }
 

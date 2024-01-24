@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.model.validators.IsAfter;
@@ -14,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class Film {
+public class Film implements Cloneable {
     private Integer id;
 
     @NotBlank(message = "Name cannot be null or whitespace")
@@ -32,5 +31,12 @@ public class Film {
     private Integer duration;
 
     private Set<Integer> likes = new HashSet<>();
-}
 
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException("Error with clonning object");
+        }
+    }
+}

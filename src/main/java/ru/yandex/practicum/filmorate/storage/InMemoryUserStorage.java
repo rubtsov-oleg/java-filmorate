@@ -14,8 +14,8 @@ import java.util.NoSuchElementException;
 public class InMemoryUserStorage implements UserStorage {
     private final HashMap<Integer, User> users = new HashMap<>();
 
-    public User create(User user){
-        if (user.getName() == null) {
+    public User create(User user) {
+        if (user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         user.setId(IdIterator.getUserId());
@@ -43,7 +43,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(userId)) {
             throw new NoSuchElementException("User with ID " + userId + " not found");
         }
-        return users.get(userId);
+        return (User) users.get(userId).clone();
     }
 
     public List<User> getAll() {

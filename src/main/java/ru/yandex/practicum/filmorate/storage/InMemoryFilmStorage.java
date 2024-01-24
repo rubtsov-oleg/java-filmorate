@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 public class InMemoryFilmStorage implements FilmStorage {
     private final HashMap<Integer, Film> films = new HashMap<>();
 
-    public Film create(Film film){
+    public Film create(Film film) {
         film.setId(IdIterator.getFilmId());
         films.put(film.getId(), film);
         return film;
@@ -40,7 +40,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!films.containsKey(filmId)) {
             throw new NoSuchElementException("Film with ID " + filmId + " not found");
         }
-        return films.get(filmId);
+        return (Film) films.get(filmId).clone();
     }
 
     public List<Film> getAll() {

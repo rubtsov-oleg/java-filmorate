@@ -4,11 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import javax.validation.ValidationException;
 import java.util.*;
 
 @Service
@@ -36,24 +34,26 @@ public class FilmService {
 
     public void addLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getById(filmId);
-        User user = userStorage.getById(userId);
+        userStorage.getById(userId);
         Set<Integer> filmLikes = film.getLikes();
-        if (filmLikes.contains(user.getId())) {
+        if (filmLikes.contains(userId)) {
             throw new AlreadyExistsException("User with ID " + userId + " already liked this film");
         }
-        filmLikes.add(user.getId());
+        filmLikes.add(userId);
         film.setLikes(filmLikes);
+        filmStorage.update(film);
     }
 
     public void removeLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getById(filmId);
-        User user = userStorage.getById(userId);
+        userStorage.getById(userId);
         Set<Integer> filmLikes = film.getLikes();
-        if (!filmLikes.contains(user.getId())) {
+        if (!filmLikes.contains(userId)) {
             throw new NoSuchElementException("User with ID " + userId + " not liked this film");
         }
-        filmLikes.remove(user.getId());
+        filmLikes.remove(userId);
         film.setLikes(filmLikes);
+        filmStorage.update(film);
     }
 
     public List<Film> getPopularFilms(Integer count) {
