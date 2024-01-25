@@ -9,9 +9,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-public class Film {
+public class Film implements Cloneable {
     private Integer id;
 
     @NotBlank(message = "Name cannot be null or whitespace")
@@ -27,5 +29,14 @@ public class Film {
 
     @Positive(message = "Duration must be positive")
     private Integer duration;
-}
 
+    private Set<Integer> likes = new HashSet<>();
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException("Error with clonning object");
+        }
+    }
+}

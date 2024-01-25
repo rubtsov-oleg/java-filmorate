@@ -52,10 +52,7 @@ public class FilmValidationTest {
     public void testFilmFailDescription() {
         Film film = new Film();
         film.setName("testFilm");
-        film.setDescription("testDescriptionqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" +
-                "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" +
-                "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" +
-                "qqqqqqqqqqqqqqqqqqqqqqqqq");
+        film.setDescription("q".repeat(201));
         film.setReleaseDate(LocalDate.now().minusYears(5));
         film.setDuration(2);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
