@@ -55,4 +55,13 @@ public class ErrorHandler {
         log.info("400 {}", ex.getMessage());
         return errors;
     }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public Map<String, String> handleOtherException(Exception ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        log.info("500 {}", ex.getMessage());
+        return errors;
+    }
 }
