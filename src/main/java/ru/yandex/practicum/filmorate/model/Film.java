@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class Film implements Cloneable {
@@ -27,6 +28,10 @@ public class Film implements Cloneable {
 
     @Positive(message = "Duration must be positive")
     private Integer duration;
+
+    private Mpa mpa;
+
+    private List<Genre> genres;
 
     public Object clone() {
         try {

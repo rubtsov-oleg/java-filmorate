@@ -21,8 +21,20 @@ public class IdIterator {
         return friendId;
     }
 
+    public static int getGenreId() {
+        genreId += 1;
+        return genreId;
+    }
+
+    public static int getMpaId() {
+        mpaId += 1;
+        return mpaId;
+    }
+
     private static int filmId = 0;
     private static int userId = 0;
     private static int likeId = 0;
     private static int friendId = 0;
+    private static int genreId = 0;
+    private static int mpaId = 0;
 }
