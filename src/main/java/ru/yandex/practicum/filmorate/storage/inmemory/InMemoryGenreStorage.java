@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.inmemory;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.core.IdIterator;
@@ -19,6 +19,7 @@ public class InMemoryGenreStorage implements GenreStorage {
         genres.put(genre.getId(), genre);
         return genre;
     }
+
     public Genre getById(Integer genreId) {
         if (!genres.containsKey(genreId)) {
             throw new NoSuchElementException("Genre with ID " + genreId + " not found");

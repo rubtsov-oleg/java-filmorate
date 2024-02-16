@@ -27,7 +27,7 @@ public class MpaInitializer {
     public void init() {
         List<Mpa> mpaList = mpaStorage.getAll();
         List<String> mpaNames = new ArrayList<>();
-        for (Mpa mpa: mpaList) {
+        for (Mpa mpa : mpaList) {
             mpaNames.add(mpa.getName());
         }
         try (FileReader reader = new FileReader(mpaFilePath, StandardCharsets.UTF_8)) {

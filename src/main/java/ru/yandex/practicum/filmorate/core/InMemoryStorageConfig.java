@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.core;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.inmemory.*;
 import ru.yandex.practicum.filmorate.storage.interfaces.*;
 
 @Configuration

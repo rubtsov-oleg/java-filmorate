@@ -22,23 +22,6 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        Mpa mpa1 = new Mpa();
-        mpa1.setName("mpa1");
-        mpaStorage.create(mpa1);
-
-        Mpa mpa2 = new Mpa();
-        mpa2.setName("mpa2");
-        mpaStorage.create(mpa2);
-
-        Mpa mpa3 = new Mpa();
-        mpa3.setName("mpa3");
-        mpaStorage.create(mpa3);
-
-        Genre genre1 = new Genre();
-        genre1.setName("genre1");
-        genreStorage.create(genre1);
-
-
         Film enrichtedFilm = enrichmentMpaAndGenres(film);
         return filmStorage.create(enrichtedFilm);
     }
@@ -55,16 +38,17 @@ public class FilmService {
             film.setMpa(existedMpa);
         }
 
-        List<Genre> genres = film.getGenres();
+        Set<Genre> genres = film.getGenres();
         if (genres != null) {
-            List<Genre> existedGenres = new ArrayList<>();
-            for (Genre genre: genres) {
+            Set<Genre> existedGenres = new HashSet<>();
+            for (Genre genre : genres) {
                 Genre existedGenre = genreStorage.getById(genre.getId());
                 existedGenres.add(existedGenre);
             }
-            film.setGenres(existedGenres);
+            List<Genre> sortedGenres = new ArrayList<>(existedGenres);
+            sortedGenres.sort(Comparator.comparingInt(Genre::getId));
+            film.setGenres(new LinkedHashSet<>(sortedGenres));
         }
-
         return film;
     }
 

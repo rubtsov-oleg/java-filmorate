@@ -27,7 +27,7 @@ public class GenreInitializer {
     public void init() {
         List<Genre> genres = genreStorage.getAll();
         List<String> genreNames = new ArrayList<>();
-        for (Genre genre: genres) {
+        for (Genre genre : genres) {
             genreNames.add(genre.getName());
         }
         try (FileReader reader = new FileReader(genresFilePath, StandardCharsets.UTF_8)) {

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.inmemory;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.core.IdIterator;
@@ -19,6 +19,7 @@ public class InMemoryMpaStorage implements MpaStorage {
         mpaHashMap.put(mpa.getId(), mpa);
         return mpa;
     }
+
     public Mpa getById(Integer mpaId) {
         if (!mpaHashMap.containsKey(mpaId)) {
             throw new NoSuchElementException("MPA with ID " + mpaId + " not found");

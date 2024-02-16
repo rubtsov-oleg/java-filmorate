@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
+import ru.yandex.practicum.filmorate.exception.SelfFriendshipException;
 import ru.yandex.practicum.filmorate.model.Friend;
+import ru.yandex.practicum.filmorate.model.FriendStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
@@ -34,34 +36,51 @@ public class UserService {
     }
 
     public void addFriend(Integer userId, Integer friendId) {
+        if (userId.equals(friendId)) {
+            throw new SelfFriendshipException("User cannot be a friend to themselves.");
+        }
+
         User user = userStorage.getById(userId);
         User friend = userStorage.getById(friendId);
+
         if (friendStorage.getByUserAndFriend(user, friend).isPresent()) {
             throw new AlreadyExistsException("User with ID " + friendId + " already in friend-list");
+        }
+
+        Optional<Friend> friendFriendEntryOpt = friendStorage.getByUserAndFriend(friend, user);
+        if (friendFriendEntryOpt.isPresent()) {
+            Friend friendFriendEntry = friendFriendEntryOpt.get();
+            friendFriendEntry.setFriendStatus(FriendStatus.CONFIRMED);
+            friendStorage.update(friendFriendEntry);
+            return;
         }
 
         Friend userFriendEntry = new Friend();
         userFriendEntry.setUserId(user);
         userFriendEntry.setFriendId(friend);
+        userFriendEntry.setFriendStatus(FriendStatus.UNCONFIRMED);
         friendStorage.create(userFriendEntry);
-
-        Friend friendFriendEntry = new Friend();
-        friendFriendEntry.setUserId(friend);
-        friendFriendEntry.setFriendId(user);
-        friendStorage.create(friendFriendEntry);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {
         User user = userStorage.getById(userId);
         User friend = userStorage.getById(friendId);
-        Optional<Friend> userFriendEntry = friendStorage.getByUserAndFriend(user, friend);
-        if (userFriendEntry.isEmpty()) {
-            throw new NoSuchElementException("User with ID " + friendId + " not in friend-list");
-        }
-        friendStorage.delete(userFriendEntry.get().getId());
 
-        Optional<Friend> friendFriendEntry = friendStorage.getByUserAndFriend(friend, user);
-        friendFriendEntry.ifPresent(value -> friendStorage.delete(value.getId()));
+        Optional<Friend> userFriendEntryOpt = friendStorage.getByUserAndFriend(user, friend);
+        if (userFriendEntryOpt.isPresent()) {
+            friendStorage.delete(userFriendEntryOpt.get().getId());
+            return;
+        }
+
+        Optional<Friend> friendFriendEntryOpt = friendStorage.getByUserAndFriend(friend, user);
+        if (friendFriendEntryOpt.isPresent()) {
+            Friend friendFriendEntry = friendFriendEntryOpt.get();
+            friendFriendEntry.setFriendStatus(FriendStatus.UNCONFIRMED);
+            friendStorage.update(friendFriendEntry);
+            return;
+        }
+
+        throw new NoSuchElementException("User with ID " + friendId + " not in friend-list");
     }
 
     public List<User> getFriends(Integer userId) {
@@ -69,23 +88,26 @@ public class UserService {
         List<Friend> friendEntries = friendStorage.getByUser(user);
         List<User> friends = new ArrayList<>();
         for (Friend friendEntry : friendEntries) {
-            friends.add(userStorage.getById(friendEntry.getFriendId().getId()));
+            if (friendEntry.getUserId().getId().equals(userId)) {
+                friends.add(userStorage.getById(friendEntry.getFriendId().getId()));
+            } else {
+                friends.add(userStorage.getById(friendEntry.getUserId().getId()));
+            }
         }
         friends.sort(Comparator.comparingInt(User::getId));
         return friends;
     }
-
 
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
         List<Friend> userFriendEntries = friendStorage.getByUser(userStorage.getById(userId));
         List<Friend> otherFriendEntries = friendStorage.getByUser(userStorage.getById(otherId));
 
         Set<Integer> userFriends = userFriendEntries.stream()
-                .map(friend -> friend.getFriendId().getId())
+                .map(friend -> friend.getUserId().getId().equals(userId) ? friend.getFriendId().getId() : friend.getUserId().getId())
                 .collect(Collectors.toSet());
 
         Set<Integer> otherFriends = otherFriendEntries.stream()
-                .map(friend -> friend.getFriendId().getId())
+                .map(friend -> friend.getUserId().getId().equals(otherId) ? friend.getFriendId().getId() : friend.getUserId().getId())
                 .collect(Collectors.toSet());
 
         userFriends.retainAll(otherFriends);

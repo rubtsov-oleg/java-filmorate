@@ -14,4 +14,6 @@ public interface FriendStorage {
     List<Friend> getByUser(User user);
 
     Optional<Friend> getByUserAndFriend(User user, User friend);
+
+    Friend update(Friend friend);
 }
