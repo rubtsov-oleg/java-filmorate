@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.inmemory;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.core.IdIterator;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -11,6 +12,7 @@ import java.util.*;
 
 
 @Component
+@Profile("inMemory")
 public class InMemoryLikeStorage implements LikeStorage {
     private final HashMap<Integer, Like> likes = new HashMap<>();
 
@@ -30,7 +32,7 @@ public class InMemoryLikeStorage implements LikeStorage {
     public List<Like> getByFilm(Film film) {
         List<Like> filmLikes = new ArrayList<>();
         for (Like like : likes.values()) {
-            if (like.getFilmId().equals(film)) {
+            if (Objects.equals(like.getFilmId(), film.getId())) {
                 filmLikes.add(like);
             }
         }
@@ -39,7 +41,7 @@ public class InMemoryLikeStorage implements LikeStorage {
 
     public Optional<Like> getByFilmAndUser(Film film, User user) {
         for (Like like : likes.values()) {
-            if (like.getFilmId().equals(film) && (like.getUserId().equals(user))) {
+            if (Objects.equals(like.getFilmId(), film.getId()) && Objects.equals(like.getUserId(), user.getId())) {
                 return Optional.of(like);
             }
         }

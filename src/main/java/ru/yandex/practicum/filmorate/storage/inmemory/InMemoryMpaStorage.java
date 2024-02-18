@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.inmemory;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.core.IdIterator;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
+@Profile("inMemory")
 public class InMemoryMpaStorage implements MpaStorage {
     private final HashMap<Integer, Mpa> mpaHashMap = new HashMap<>();
 

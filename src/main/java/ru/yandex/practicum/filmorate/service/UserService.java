@@ -56,8 +56,8 @@ public class UserService {
         }
 
         Friend userFriendEntry = new Friend();
-        userFriendEntry.setUserId(user);
-        userFriendEntry.setFriendId(friend);
+        userFriendEntry.setUserId(user.getId());
+        userFriendEntry.setFriendId(friend.getId());
         userFriendEntry.setFriendStatus(FriendStatus.UNCONFIRMED);
         friendStorage.create(userFriendEntry);
     }
@@ -88,10 +88,10 @@ public class UserService {
         List<Friend> friendEntries = friendStorage.getByUser(user);
         List<User> friends = new ArrayList<>();
         for (Friend friendEntry : friendEntries) {
-            if (friendEntry.getUserId().getId().equals(userId)) {
-                friends.add(userStorage.getById(friendEntry.getFriendId().getId()));
+            if (friendEntry.getUserId().equals(userId)) {
+                friends.add(userStorage.getById(friendEntry.getFriendId()));
             } else {
-                friends.add(userStorage.getById(friendEntry.getUserId().getId()));
+                friends.add(userStorage.getById(friendEntry.getUserId()));
             }
         }
         friends.sort(Comparator.comparingInt(User::getId));
@@ -103,11 +103,11 @@ public class UserService {
         List<Friend> otherFriendEntries = friendStorage.getByUser(userStorage.getById(otherId));
 
         Set<Integer> userFriends = userFriendEntries.stream()
-                .map(friend -> friend.getUserId().getId().equals(userId) ? friend.getFriendId().getId() : friend.getUserId().getId())
+                .map(friend -> friend.getUserId().equals(userId) ? friend.getFriendId() : friend.getUserId())
                 .collect(Collectors.toSet());
 
         Set<Integer> otherFriends = otherFriendEntries.stream()
-                .map(friend -> friend.getUserId().getId().equals(otherId) ? friend.getFriendId().getId() : friend.getUserId().getId())
+                .map(friend -> friend.getUserId().equals(otherId) ? friend.getFriendId() : friend.getUserId())
                 .collect(Collectors.toSet());
 
         userFriends.retainAll(otherFriends);

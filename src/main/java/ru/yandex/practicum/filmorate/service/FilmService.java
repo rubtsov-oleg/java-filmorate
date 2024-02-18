@@ -59,8 +59,8 @@ public class FilmService {
             throw new AlreadyExistsException("User with ID " + userId + " already liked this film");
         }
         Like like = new Like();
-        like.setFilmId(film);
-        like.setUserId(user);
+        like.setFilmId(film.getId());
+        like.setUserId(user.getId());
         likeStorage.create(like);
     }
 

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.inmemory;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.core.IdIterator;
 import ru.yandex.practicum.filmorate.model.Friend;
@@ -10,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.interfaces.FriendStorage;
 import java.util.*;
 
 @Component
+@Profile("inMemory")
 public class InMemoryFriendStorage implements FriendStorage {
     private final HashMap<Integer, Friend> friends = new HashMap<>();
 
@@ -38,10 +40,10 @@ public class InMemoryFriendStorage implements FriendStorage {
     public List<Friend> getByUser(User user) {
         List<Friend> userFriends = new ArrayList<>();
         for (Friend friendEntry : friends.values()) {
-            if (friendEntry.getUserId().equals(user)) {
+            if (friendEntry.getUserId().equals(user.getId())) {
                 userFriends.add((Friend) friendEntry.clone());
             }
-            if (friendEntry.getFriendId().equals(user) && friendEntry.getFriendStatus().equals(FriendStatus.CONFIRMED)) {
+            if (friendEntry.getFriendId().equals(user.getId()) && friendEntry.getFriendStatus().equals(FriendStatus.CONFIRMED)) {
                 userFriends.add((Friend) friendEntry.clone());
             }
         }
@@ -50,7 +52,7 @@ public class InMemoryFriendStorage implements FriendStorage {
 
     public Optional<Friend> getByUserAndFriend(User user, User friend) {
         for (Friend friendEntry : friends.values()) {
-            if (friendEntry.getUserId().equals(user) && (friendEntry.getFriendId().equals(friend))) {
+            if (friendEntry.getUserId().equals(user.getId()) && (friendEntry.getFriendId().equals(friend.getId()))) {
                 return Optional.of((Friend) friendEntry.clone());
             }
         }

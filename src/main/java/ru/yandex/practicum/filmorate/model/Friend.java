@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class Friend implements Cloneable {
     private Integer id;
-    private User userId;
-    private User friendId;
+    private Integer userId;
+    private Integer friendId;
     private FriendStatus friendStatus;
 
     public Object clone() {
