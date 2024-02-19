@@ -1,2 +1,2 @@
 # java-filmorate
-Template repository for Filmorate project.
+![Иллюстрация к проекту](https://github.com/rubtsov-oleg/java-filmorate/blob/main/schema.png)
