@@ -9,5 +9,5 @@ public interface GenreStorage {
 
     List<Genre> getAll();
 
-    Genre create(Genre genre);
+    List<Genre> getByIds(List<Integer> genreIds);
 }

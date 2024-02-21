@@ -1,24 +1,20 @@
-package ru.yandex.practicum.filmorate.storage.indb;
+package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.indb.statements.MpaPreparedStatementSetter;
 import ru.yandex.practicum.filmorate.storage.interfaces.MpaStorage;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@Component
-@Profile("inDb")
+@Repository
 @RequiredArgsConstructor
 public class InDbMpaStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final DatabaseUtil databaseUtil;
 
     private final RowMapper<Mpa> mpaRowMapper = (resultSet, rowNum) -> {
         Mpa mpa = new Mpa();
@@ -26,13 +22,6 @@ public class InDbMpaStorage implements MpaStorage {
         mpa.setName(resultSet.getString("name"));
         return mpa;
     };
-
-    public Mpa create(Mpa mpa) {
-        String sql = "INSERT INTO mpa (name) VALUES (?);";
-        int mpaId = databaseUtil.insertAndReturnId(sql, new MpaPreparedStatementSetter(mpa));
-        mpa.setId(mpaId);
-        return mpa;
-    }
 
     public Mpa getById(Integer mpaId) {
         String sql = "SELECT id, name FROM mpa WHERE id = ?;";

@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.indb.DatabaseUtil;
-import ru.yandex.practicum.filmorate.storage.indb.InDbMpaStorage;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,49 +25,25 @@ public class InDbMpaStorageTest {
 
     @BeforeEach
     public void setUp() {
-        DatabaseUtil databaseUtil = new DatabaseUtil(jdbcTemplate);
-        inDbMpaStorage = new InDbMpaStorage(jdbcTemplate, databaseUtil);
-    }
-
-    @Test
-    public void testCreate() {
-        Mpa newMpa = new Mpa();
-        newMpa.setName("Test");
-        inDbMpaStorage.create(newMpa);
-
-        Mpa savedMpa = inDbMpaStorage.getById(1);
-
-        assertNotNull(savedMpa);
-        assertEquals(newMpa.getName(), savedMpa.getName());
+        inDbMpaStorage = new InDbMpaStorage(jdbcTemplate);
     }
 
     @Test
     public void testGetById() {
-        Mpa newMpa = new Mpa();
-        newMpa.setName("Test");
-        inDbMpaStorage.create(newMpa);
+        Mpa mpa = inDbMpaStorage.getById(1);
 
         assertThrows(NoSuchElementException.class, () -> {
-            inDbMpaStorage.getById(2);
+            inDbMpaStorage.getById(999);
         });
-        assertNotNull(inDbMpaStorage.getById(1));
+        assertNotNull(mpa);
+        assertEquals(mpa.getName(), "G");
     }
 
     @Test
     public void testGetAll() {
-        Mpa newMpa = new Mpa();
-        newMpa.setName("Test");
-        Mpa newMpa2 = new Mpa();
-        newMpa2.setName("Test2");
+        List<Mpa> mpaList = inDbMpaStorage.getAll();
 
-        List<Mpa> emptyList = inDbMpaStorage.getAll();
-        inDbMpaStorage.create(newMpa);
-        List<Mpa> listWithOneItem = inDbMpaStorage.getAll();
-        inDbMpaStorage.create(newMpa2);
-        List<Mpa> listWithTwoItems = inDbMpaStorage.getAll();
-
-        assertEquals(emptyList.size(), 0);
-        assertEquals(listWithOneItem.size(), 1);
-        assertEquals(listWithTwoItems.size(), 2);
+        assertEquals(mpaList.size(), 5);
+        assertEquals(mpaList.get(0).getName(), "G");
     }
 }

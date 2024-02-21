@@ -1,22 +1,21 @@
-package ru.yandex.practicum.filmorate.storage.indb;
+package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.indb.statements.FilmPreparedStatementSetter;
+import ru.yandex.practicum.filmorate.storage.statements.FilmPreparedStatementSetter;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.*;
 
-@Component
-@Profile("inDb")
+@Repository
 @RequiredArgsConstructor
 public class InDbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -39,8 +38,8 @@ public class InDbFilmStorage implements FilmStorage {
 
     private final RowMapper<Genre> genreRowMapper = (resultSet, rowNum) -> {
         Genre genre = new Genre();
-        genre.setId(resultSet.getInt("id"));
-        genre.setName(resultSet.getString("name"));
+        genre.setId(resultSet.getInt("genre_id"));
+        genre.setName(resultSet.getString("genre_name"));
         return genre;
     };
 
@@ -57,8 +56,14 @@ public class InDbFilmStorage implements FilmStorage {
     }
 
     private void insertFilmGenres(Integer filmId, Set<Genre> genres) {
-        String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?);";
-        genres.forEach(genre -> jdbcTemplate.update(sql, filmId, genre.getId()));
+        jdbcTemplate.batchUpdate(
+                "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?);",
+                genres,
+                genres.size(),
+                (PreparedStatement ps, Genre genre) -> {
+                    ps.setInt(1, filmId);
+                    ps.setInt(2, genre.getId());
+                });
     }
 
     public Film update(Film film) {
@@ -116,26 +121,42 @@ public class InDbFilmStorage implements FilmStorage {
     }
 
     public Set<Genre> getGenresByFilm(Integer filmId) {
-        String sql = "SELECT g.id, g.name FROM genres g JOIN film_genres fg ON g.id = fg.genre_id WHERE fg.film_id = ?;";
+        String sql = "SELECT g.id as genre_id, g.name as genre_name FROM genres g JOIN film_genres fg ON g.id = fg.genre_id WHERE fg.film_id = ?;";
         return new HashSet<>(jdbcTemplate.query(sql, genreRowMapper, filmId));
     }
 
     public List<Film> getAll() {
         String sql = "SELECT " +
-                "  f.id, " +
-                "  f.name," +
-                "  f.description," +
-                "  f.release_date," +
-                "  f.duration," +
+                "  f.*, " +
                 "  m.id as mpa_id, " +
-                "  m.name as mpa_name " +
-                "FROM films f JOIN mpa m ON f.mpa_id = m.id ";
-        List<Film> films = jdbcTemplate.query(sql, filmRowMapper);
+                "  m.name as mpa_name, " +
+                "  g.id as genre_id, " +
+                "  g.name as genre_name " +
+                "FROM films f " +
+                "JOIN mpa m ON f.mpa_id = m.id " +
+                "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genres g ON fg.genre_id = g.id";
 
-        for (Film film : films) {
-            Set<Genre> genres = getGenresByFilm(film.getId());
-            film.setGenres(genres);
-        }
-        return films;
+        Map<Integer, Film> filmMap = new HashMap<>();
+        jdbcTemplate.query(sql, resultSet -> {
+            int filmId = resultSet.getInt("id");
+            Film film = filmMap.get(filmId);
+            if (film == null) {
+                film = filmRowMapper.mapRow(resultSet, resultSet.getRow());
+                if (film != null) {
+                    film.setGenres(new HashSet<>());
+                    filmMap.put(filmId, film);
+                }
+
+            }
+            int genreId = resultSet.getInt("genre_id");
+            if (genreId != 0) {
+                Genre genre = genreRowMapper.mapRow(resultSet, resultSet.getRow());
+                if (film != null) {
+                    film.getGenres().add(genre);
+                }
+            }
+        });
+        return new ArrayList<>(filmMap.values());
     }
 }

@@ -1,21 +1,19 @@
-package ru.yandex.practicum.filmorate.storage.indb;
+package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.indb.statements.FriendPreparedStatementSetter;
+import ru.yandex.practicum.filmorate.storage.statements.FriendPreparedStatementSetter;
 import ru.yandex.practicum.filmorate.storage.interfaces.FriendStorage;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-@Component
-@Profile("inDb")
+@Repository
 @RequiredArgsConstructor
 public class InDbFriendStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;

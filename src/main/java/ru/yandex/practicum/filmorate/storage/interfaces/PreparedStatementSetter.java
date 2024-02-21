@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.indb.interfaces;
+package ru.yandex.practicum.filmorate.storage.interfaces;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

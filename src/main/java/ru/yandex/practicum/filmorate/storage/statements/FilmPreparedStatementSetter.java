@@ -1,8 +1,8 @@
-package ru.yandex.practicum.filmorate.storage.indb.statements;
+package ru.yandex.practicum.filmorate.storage.statements;
 
 import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.indb.interfaces.PreparedStatementSetter;
+import ru.yandex.practicum.filmorate.storage.interfaces.PreparedStatementSetter;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;

@@ -8,8 +8,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.indb.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -25,49 +25,34 @@ public class InDbGenreStorageTest {
 
     @BeforeEach
     public void setUp() {
-        DatabaseUtil databaseUtil = new DatabaseUtil(jdbcTemplate);
-        inDbGenreStorage = new InDbGenreStorage(jdbcTemplate, databaseUtil);
-    }
-
-    @Test
-    public void testCreate() {
-        Genre newGenre = new Genre();
-        newGenre.setName("Test");
-        inDbGenreStorage.create(newGenre);
-
-        Genre savedGenre = inDbGenreStorage.getById(1);
-
-        assertNotNull(savedGenre);
-        assertEquals(newGenre.getName(), savedGenre.getName());
+        inDbGenreStorage = new InDbGenreStorage(jdbcTemplate);
     }
 
     @Test
     public void testGetById() {
-        Genre newGenre = new Genre();
-        newGenre.setName("Test");
-        inDbGenreStorage.create(newGenre);
+        Genre genre = inDbGenreStorage.getById(1);
 
         assertThrows(NoSuchElementException.class, () -> {
-            inDbGenreStorage.getById(2);
+            inDbGenreStorage.getById(999);
         });
-        assertNotNull(inDbGenreStorage.getById(1));
+        assertNotNull(genre);
+        assertEquals(genre.getName(), "Комедия");
     }
 
     @Test
     public void testGetAll() {
-        Genre newGenre = new Genre();
-        newGenre.setName("Test");
-        Genre newGenre2 = new Genre();
-        newGenre2.setName("Test2");
+        List<Genre> genreList = inDbGenreStorage.getAll();
 
-        List<Genre> emptyList = inDbGenreStorage.getAll();
-        inDbGenreStorage.create(newGenre);
-        List<Genre> listWithOneItem = inDbGenreStorage.getAll();
-        inDbGenreStorage.create(newGenre2);
-        List<Genre> listWithTwoItems = inDbGenreStorage.getAll();
+        assertEquals(genreList.size(), 6);
+        assertEquals(genreList.get(0).getName(), "Комедия");
+    }
 
-        assertEquals(emptyList.size(), 0);
-        assertEquals(listWithOneItem.size(), 1);
-        assertEquals(listWithTwoItems.size(), 2);
+    @Test
+    public void testGetByIds() {
+        List<Genre> genreList = inDbGenreStorage.getByIds(Arrays.asList(1, 2));
+
+        assertEquals(genreList.size(), 2);
+        assertEquals(genreList.get(0).getName(), "Комедия");
+        assertEquals(genreList.get(1).getName(), "Драма");
     }
 }

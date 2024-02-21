@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.indb.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -32,7 +31,7 @@ public class InDbLikeStorageTest {
         inDbLikeStorage = new InDbLikeStorage(jdbcTemplate, databaseUtil);
         InDbFilmStorage inDbFilmStorage = new InDbFilmStorage(jdbcTemplate, databaseUtil);
         InDbUserStorage inDbUserStorage = new InDbUserStorage(jdbcTemplate, databaseUtil);
-        InDbMpaStorage inDbMpaStorage = new InDbMpaStorage(jdbcTemplate, databaseUtil);
+        InDbMpaStorage inDbMpaStorage = new InDbMpaStorage(jdbcTemplate);
         user = createUser(inDbUserStorage);
         user2 = createUser(inDbUserStorage);
         film = createFilm(inDbFilmStorage, inDbMpaStorage);
@@ -125,7 +124,7 @@ public class InDbLikeStorageTest {
         film.setDescription("Test");
         film.setDuration(1);
         film.setReleaseDate(LocalDate.of(2020, 5, 3));
-        film.setMpa(inDbMpaStorage.create(mpa));
+        film.setMpa(inDbMpaStorage.getById(1));
         film.setGenres(new HashSet<>());
         return inDbFilmStorage.create(film);
     }

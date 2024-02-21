@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.interfaces.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,17 +39,10 @@ public class FilmService {
             film.setMpa(existedMpa);
         }
 
-        Set<Genre> genres = film.getGenres();
-        if (genres != null) {
-            Set<Genre> existedGenres = new HashSet<>();
-            for (Genre genre : genres) {
-                Genre existedGenre = genreStorage.getById(genre.getId());
-                existedGenres.add(existedGenre);
-            }
-            List<Genre> sortedGenres = new ArrayList<>(existedGenres);
-            sortedGenres.sort(Comparator.comparingInt(Genre::getId));
-            film.setGenres(new LinkedHashSet<>(sortedGenres));
-        }
+        List<Integer> genreIds = film.getGenres().stream()
+                .map(Genre::getId)
+                .collect(Collectors.toList());
+        film.setGenres(new LinkedHashSet<>(genreStorage.getByIds(genreIds)));
         return film;
     }
 

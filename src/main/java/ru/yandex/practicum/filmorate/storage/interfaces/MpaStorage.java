@@ -8,6 +8,4 @@ public interface MpaStorage {
     Mpa getById(Integer mpaId);
 
     List<Mpa> getAll();
-
-    Mpa create(Mpa mpa);
 }

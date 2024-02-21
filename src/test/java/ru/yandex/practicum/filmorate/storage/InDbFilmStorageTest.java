@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.indb.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -32,13 +31,13 @@ public class InDbFilmStorageTest {
         DatabaseUtil databaseUtil = new DatabaseUtil(jdbcTemplate);
         inDbFilmStorage = new InDbFilmStorage(jdbcTemplate, databaseUtil);
 
-        InDbMpaStorage inDbMpaStorage = new InDbMpaStorage(jdbcTemplate, databaseUtil);
-        mpa1 = createMpa(inDbMpaStorage);
-        mpa2 = createMpa(inDbMpaStorage);
+        InDbMpaStorage inDbMpaStorage = new InDbMpaStorage(jdbcTemplate);
+        mpa1 = inDbMpaStorage.getById(1);
+        mpa2 = inDbMpaStorage.getById(2);
 
-        InDbGenreStorage inDbGenreStorage = new InDbGenreStorage(jdbcTemplate, databaseUtil);
-        genre1 = createGenre(inDbGenreStorage);
-        genre2 = createGenre(inDbGenreStorage);
+        InDbGenreStorage inDbGenreStorage = new InDbGenreStorage(jdbcTemplate);
+        genre1 = inDbGenreStorage.getById(1);
+        genre2 = inDbGenreStorage.getById(2);
     }
 
     @Test
@@ -168,17 +167,5 @@ public class InDbFilmStorageTest {
         assertEquals(inDbFilmStorage.getAll().size(), 2);
         assertEquals(inDbFilmStorage.getAll().get(0), film);
         assertEquals(inDbFilmStorage.getAll().get(1), film2);
-    }
-
-    public Mpa createMpa(InDbMpaStorage inDbMpaStorage) {
-        Mpa mpa = new Mpa();
-        mpa.setName("test");
-        return inDbMpaStorage.create(mpa);
-    }
-
-    public Genre createGenre(InDbGenreStorage inDbGenreStorage) {
-        Genre genre = new Genre();
-        genre.setName("test");
-        return inDbGenreStorage.create(genre);
     }
 }
