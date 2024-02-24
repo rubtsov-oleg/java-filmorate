@@ -30,7 +30,9 @@ public class Film implements Cloneable {
     @Positive(message = "Duration must be positive")
     private Integer duration;
 
-    private Set<Integer> likes = new HashSet<>();
+    private Mpa mpa;
+
+    private Set<Genre> genres = new HashSet<>();
 
     public Object clone() {
         try {
